@@ -3477,70 +3477,122 @@ for i in range(5)
             }
         }
 
-        // Simple working chatbot function
+        // Simple working chatbot function - COMPLETELY INDEPENDENT
         function sendUnifiedMessage() {
-            console.log('sendUnifiedMessage called');
+            console.log('🚀 Simple sendUnifiedMessage called');
 
-            // Get the message input
-            const messageInput = document.getElementById('messageInput');
-            if (!messageInput) {
-                console.error('messageInput not found');
-                return;
+            try {
+                // Get the message input
+                const messageInput = document.getElementById('messageInput');
+                if (!messageInput) {
+                    console.error('❌ messageInput not found');
+                    addSimpleMessage('Error: Message input not found. Please refresh the page.', false);
+                    return;
+                }
+
+                const message = messageInput.value.trim();
+                if (!message) {
+                    console.log('⚠️ No message to send');
+                    return;
+                }
+
+                console.log('📝 Sending message:', message);
+
+                // Add user message immediately
+                addSimpleMessage(message, true);
+                messageInput.value = '';
+
+                // Add bot response after short delay
+                setTimeout(() => {
+                    try {
+                        const response = getSimpleResponse(message);
+                        addSimpleMessage(response, false);
+                        console.log('✅ Response added successfully');
+                    } catch (error) {
+                        console.error('❌ Error generating response:', error);
+                        addSimpleMessage('I apologize, but I encountered an issue generating a response. Please try asking again!', false);
+                    }
+                }, 300);
+
+            } catch (error) {
+                console.error('❌ Critical error in sendUnifiedMessage:', error);
+                addSimpleMessage('Something went wrong. Please refresh the page and try again.', false);
             }
-
-            const message = messageInput.value.trim();
-            if (!message) {
-                console.log('No message to send');
-                return;
-            }
-
-            console.log('Sending message:', message);
-
-            // Add user message
-            addSimpleMessage(message, true);
-            messageInput.value = '';
-
-            // Get and add bot response
-            setTimeout(() => {
-                const response = getSimpleResponse(message);
-                addSimpleMessage(response, false);
-            }, 500);
         }
 
-        // Simple message adding function
+        // Simple message adding function - BULLETPROOF
         function addSimpleMessage(content, isUser = false) {
-            console.log('addSimpleMessage called:', content, isUser);
+            console.log('💬 addSimpleMessage called:', content.substring(0, 50) + '...', 'isUser:', isUser);
 
-            const chatMessages = document.getElementById('chatMessages');
-            if (!chatMessages) {
-                console.error('chatMessages not found');
-                return;
-            }
+            try {
+                const chatMessages = document.getElementById('chatMessages');
+                if (!chatMessages) {
+                    console.error('❌ chatMessages element not found');
+                    // Try to find alternative container
+                    const alternatives = ['messages', 'chat-container', 'chat-messages'];
+                    for (const alt of alternatives) {
+                        const altElement = document.getElementById(alt);
+                        if (altElement) {
+                            console.log('✅ Found alternative container:', alt);
+                            chatMessages = altElement;
+                            break;
+                        }
+                    }
+                    if (!chatMessages) {
+                        console.error('❌ No chat container found at all');
+                        return;
+                    }
+                }
 
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `flex mb-4 ${isUser ? 'justify-end' : 'justify-start'}`;
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex mb-4 animate-fadeInUp ${isUser ? 'justify-end' : 'justify-start'}`;
 
-            if (isUser) {
-                messageDiv.innerHTML = `
-                    <div class="bg-blue-600 text-white px-4 py-2 rounded-2xl rounded-tr-none max-w-md">
-                        ${content}
-                    </div>
-                `;
-            } else {
-                messageDiv.innerHTML = `
-                    <div class="flex items-start gap-3 max-w-md">
-                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-robot text-white text-sm"></i>
+                // Escape content to prevent XSS
+                const safeContent = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+                if (isUser) {
+                    messageDiv.innerHTML = `
+                        <div class="bg-blue-600 text-white px-4 py-2 rounded-2xl rounded-tr-none max-w-md shadow-lg">
+                            ${safeContent}
                         </div>
-                        <div class="bg-gray-700 text-white px-4 py-2 rounded-2xl rounded-tl-none">
-                            ${formatSimpleMessage(content)}
+                    `;
+                } else {
+                    messageDiv.innerHTML = `
+                        <div class="flex items-start gap-3 max-w-2xl">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-robot text-white text-sm"></i>
+                            </div>
+                            <div class="bg-gray-700 text-white px-4 py-2 rounded-2xl rounded-tl-none shadow-lg">
+                                ${formatSimpleMessage(content)}
+                            </div>
                         </div>
-                    </div>
-                `;
-            }
+                    `;
+                }
 
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatMessages.appendChild(messageDiv);
+
+                // Smooth scroll to bottom
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 100);
+
+                console.log('✅ Message added successfully');
+
+            } catch (error) {
+                console.error('❌ Error in addSimpleMessage:', error);
+                // Fallback: try to add a simple text message
+                try {
+                    const chatMessages = document.getElementById('chatMessages');
+                    if (chatMessages) {
+                        const fallbackDiv = document.createElement('div');
+                        fallbackDiv.textContent = isUser ? `You: ${content}` : `PyBot: ${content}`;
+                        fallbackDiv.style.cssText = 'padding: 10px; margin: 5px 0; background: #333; border-radius: 5px;';
+                        chatMessages.appendChild(fallbackDiv);
+                    }
+                } catch (fallbackError) {
+                    console.error('❌ Even fallback failed:', fallbackError);
+                }
+            }
         }
 
         // Format messages
@@ -3552,56 +3604,245 @@ for i in range(5)
                 .replace(/\n/g, '<br>');
         }
 
-        // Get simple response
+        // Get simple response - COMPREHENSIVE PYTHON HELP
         function getSimpleResponse(message) {
-            const lowerMessage = message.toLowerCase();
+            console.log('🤖 Generating response for:', message);
 
-            if (lowerMessage.includes('list')) {
-                return `**Python Lists 📝**
+            try {
+                const lowerMessage = message.toLowerCase();
+
+                // Greetings
+                if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                    return `👋 **Hello! I'm PyBot!**
+
+I'm here to help you learn Python programming! I can explain concepts, provide examples, and answer your questions.
+
+**Popular topics I can help with:**
+• Python Lists and Data Structures
+• Functions and Methods
+• Loops and Control Flow
+• Object-Oriented Programming
+• File Handling and I/O
+
+Just ask me anything like "What are Python lists?" or "How do functions work?"`;
+                }
+
+                // Lists
+                if (lowerMessage.includes('list')) {
+                    return `**Python Lists 📝**
 
 Lists are ordered collections that can store multiple items:
 
+**Creating and Using Lists:**
 \`\`\`python
+# Creating lists
 fruits = ['apple', 'banana', 'orange']
-fruits.append('grape')
-print(fruits)  # ['apple', 'banana', 'orange', 'grape']
+numbers = [1, 2, 3, 4, 5]
+mixed = [1, 'hello', 3.14, True]
+
+# Accessing items
+print(fruits[0])     # apple (first item)
+print(fruits[-1])    # orange (last item)
+print(fruits[1:3])   # ['banana', 'orange'] (slice)
+
+# Adding items
+fruits.append('grape')        # Add to end
+fruits.insert(1, 'mango')     # Insert at position
+
+# Removing items
+fruits.remove('banana')       # Remove specific item
+last_fruit = fruits.pop()     # Remove and return last
 \`\`\`
 
-**Common operations:**
-• \`append()\` - Add item to end
-• \`insert()\` - Add at specific position
-• \`remove()\` - Remove specific item
-• \`pop()\` - Remove and return item`;
-            }
+**Common List Methods:**
+• \`append(item)\` - Add item to end
+• \`insert(index, item)\` - Add at specific position
+• \`remove(item)\` - Remove first occurrence
+• \`pop(index)\` - Remove and return item
+• \`sort()\` - Sort the list
+• \`reverse()\` - Reverse order
+• \`len(list)\` - Get length`;
+                }
 
-            if (lowerMessage.includes('function')) {
-                return `**Python Functions 🔧**
+                // Functions
+                if (lowerMessage.includes('function')) {
+                    return `**Python Functions 🔧**
 
-Functions are reusable blocks of code:
+Functions are reusable blocks of code that perform specific tasks:
 
+**Function Basics:**
 \`\`\`python
+# Basic function
 def greet(name):
     return f"Hello, {name}!"
 
-message = greet("Python")
-print(message)  # Hello, Python!
+# Function with multiple parameters
+def calculate_area(length, width):
+    return length * width
+
+# Function with default parameter
+def power(base, exponent=2):
+    return base ** exponent
+
+# Using functions
+message = greet("Python")           # "Hello, Python!"
+area = calculate_area(5, 3)         # 15
+square = power(4)                   # 16 (uses default)
+cube = power(4, 3)                  # 64
 \`\`\`
 
-**Key concepts:**
-• Use \`def\` keyword to define
+**Key Concepts:**
+• Use \`def\` keyword to define functions
 • Parameters go in parentheses
-• Use \`return\` to send back values`;
-            }
+• Use \`return\` to send back values
+• Functions help organize and reuse code
+• Can have default parameter values`;
+                }
 
-            return `I'm here to help with Python programming! 🐍
+                // Loops
+                if (lowerMessage.includes('loop') || lowerMessage.includes('for') || lowerMessage.includes('while')) {
+                    return `**Python Loops 🔄**
 
-**Try asking about:**
+Loops let you repeat code multiple times:
+
+**For Loops:**
+\`\`\`python
+# Loop through a range
+for i in range(5):
+    print(i)  # Prints 0, 1, 2, 3, 4
+
+# Loop through a list
+fruits = ['apple', 'banana', 'orange']
+for fruit in fruits:
+    print(f"I like {fruit}")
+
+# Loop with enumerate (get index and value)
+for index, fruit in enumerate(fruits):
+    print(f"{index}: {fruit}")
+\`\`\`
+
+**While Loops:**
+\`\`\`python
+count = 0
+while count < 5:
+    print(f"Count: {count}")
+    count += 1
+\`\`\`
+
+**Loop Control:**
+• \`break\` - Exit loop early
+• \`continue\` - Skip current iteration`;
+                }
+
+                // Dictionaries
+                if (lowerMessage.includes('dictionary') || lowerMessage.includes('dict')) {
+                    return `**Python Dictionaries 📚**
+
+Dictionaries store key-value pairs:
+
+**Creating and Using Dictionaries:**
+\`\`\`python
+# Creating dictionary
+person = {
+    'name': 'John',
+    'age': 30,
+    'city': 'New York'
+}
+
+# Accessing values
+print(person['name'])        # John
+print(person.get('age'))     # 30 (safe access)
+
+# Adding/updating values
+person['job'] = 'Developer'  # Add new key-value
+person['age'] = 31           # Update existing
+
+# Dictionary methods
+keys = person.keys()         # Get all keys
+values = person.values()     # Get all values
+items = person.items()       # Get key-value pairs
+
+# Iterating through dictionary
+for key, value in person.items():
+    print(f"{key}: {value}")
+\`\`\`
+
+**Key Features:**
+• Store data as key-value pairs
+• Keys must be unique
+• Fast lookup by key
+• Mutable (can be changed)`;
+                }
+
+                // Variables
+                if (lowerMessage.includes('variable') || lowerMessage.includes('data type')) {
+                    return `**Python Variables & Data Types 📊**
+
+Variables store different types of data:
+
+\`\`\`python
+# Numbers
+age = 25                    # Integer
+price = 19.99              # Float
+complex_num = 3 + 4j       # Complex
+
+# Strings
+name = "Python"            # String
+message = 'Hello World'    # Also string
+
+# Boolean
+is_active = True
+is_complete = False
+
+# None (represents absence of value)
+result = None
+
+# Type checking
+print(type(age))           # <class 'int'>
+print(type(price))         # <class 'float'>
+print(type(name))          # <class 'str'>
+\`\`\`
+
+**Data Types:**
+• \`int\` - Whole numbers
+• \`float\` - Decimal numbers
+• \`str\` - Text
+• \`bool\` - True/False
+• \`None\` - No value`;
+                }
+
+                // Default helpful response
+                return `🐍 **I'm PyBot - Your Python Learning Assistant!**
+
+I'm here to help you learn Python programming! I have built-in knowledge about:
+
+**📚 Core Topics:**
+• **Variables & Data Types** - Numbers, strings, booleans
+• **Lists & Dictionaries** - Data structures and collections
+• **Functions** - Reusable code blocks
+• **Loops** - For loops, while loops, iteration
+• **Control Flow** - If statements, conditions
+
+**💡 Try asking:**
 • "What are Python lists?"
 • "How do functions work?"
 • "Explain Python loops"
 • "What are dictionaries?"
+• "Tell me about variables"
 
-What would you like to learn about?`;
+**🎯 Example Questions:**
+• "How to create a list in Python?"
+• "What's the difference between lists and dictionaries?"
+• "How do I write a function?"
+
+What would you like to learn about? Just type your question! 🚀`;
+
+            } catch (error) {
+                console.error('❌ Error generating response:', error);
+                return `I apologize, but I encountered an issue generating a response. Please try asking your question again!
+
+I can help with Python topics like lists, functions, loops, and dictionaries. 🐍`;
+            }
         }
 
         async function sendTextMessage() {
