@@ -1822,6 +1822,9 @@ show_args(**person)  # Kwargs: {'name': 'John', 'age': 30}</code></pre>
                                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors">
                                     <i class="fas fa-paper-plane"></i>
                                 </button>
+                                <button type="button" onclick="testSendMessage()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-3 rounded-lg transition-colors ml-2" title="Test chatbot">
+                                    <i class="fas fa-vial"></i>
+                                </button>
                             </div>
 
                             <!-- Code Input Mode -->
@@ -3479,24 +3482,47 @@ for i in range(5)
 
         // Simple working chatbot function - COMPLETELY INDEPENDENT
         function sendUnifiedMessage() {
-            console.log('🚀 Simple sendUnifiedMessage called');
+            console.log('🚀 sendUnifiedMessage called - STARTING');
+
+            // Immediate test message to verify function is called
+            alert('Function called! Check console for details.');
 
             try {
                 // Get the message input
                 const messageInput = document.getElementById('messageInput');
+                console.log('🔍 Looking for messageInput element...');
+                console.log('messageInput found:', !!messageInput);
+
                 if (!messageInput) {
                     console.error('❌ messageInput not found');
-                    addSimpleMessage('Error: Message input not found. Please refresh the page.', false);
-                    return;
+                    // Try alternative IDs
+                    const alternatives = ['simpleMessageInput', 'chatInput', 'textInput'];
+                    for (const altId of alternatives) {
+                        const altInput = document.getElementById(altId);
+                        if (altInput) {
+                            console.log('✅ Found alternative input:', altId);
+                            messageInput = altInput;
+                            break;
+                        }
+                    }
+
+                    if (!messageInput) {
+                        console.error('❌ No input element found at all');
+                        addSimpleMessage('Error: Message input not found. Please refresh the page.', false);
+                        return;
+                    }
                 }
 
                 const message = messageInput.value.trim();
+                console.log('📝 Message content:', message);
+
                 if (!message) {
                     console.log('⚠️ No message to send');
+                    addSimpleMessage('Please type a message first! 😊', false);
                     return;
                 }
 
-                console.log('📝 Sending message:', message);
+                console.log('📤 Processing message:', message);
 
                 // Add user message immediately
                 addSimpleMessage(message, true);
@@ -3518,6 +3544,15 @@ for i in range(5)
                 console.error('❌ Critical error in sendUnifiedMessage:', error);
                 addSimpleMessage('Something went wrong. Please refresh the page and try again.', false);
             }
+        }
+
+        // Alternative simple send function for testing
+        function testSendMessage() {
+            console.log('🧪 Test function called');
+            addSimpleMessage('Test message from user', true);
+            setTimeout(() => {
+                addSimpleMessage('Test response from PyBot! The chatbot is working! 🎉', false);
+            }, 500);
         }
 
         // Simple message adding function - BULLETPROOF
