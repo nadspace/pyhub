@@ -3484,9 +3484,6 @@ for i in range(5)
         function sendUnifiedMessage() {
             console.log('🚀 sendUnifiedMessage called - STARTING');
 
-            // Immediate test message to verify function is called
-            alert('Function called! Check console for details.');
-
             try {
                 // Get the message input
                 const messageInput = document.getElementById('messageInput');
@@ -3880,49 +3877,13 @@ I can help with Python topics like lists, functions, loops, and dictionaries. �
             }
         }
 
+        // REDIRECT OLD FUNCTION TO NEW SIMPLE VERSION
         async function sendTextMessage() {
-            console.log('sendTextMessage called');
-            const messageInput = document.getElementById('messageInput');
-            console.log('messageInput element:', messageInput);
-            const message = messageInput ? messageInput.value.trim() : '';
-            console.log('message:', message);
-
-            if (!message) {
-                console.log('No message, showing notification');
-                showNotification('Please enter a message', 'warning');
-                return;
-            }
-
-            // Add user message
-            console.log('Adding user message');
-            addMessage(message, true);
-            if (messageInput) messageInput.value = '';
-
-            // Add to history
-            chatHistory.push({type: 'user', message: message});
-
-            try {
-                const response = await callSmartChatbot(message);
-                addMessage(response.message);
-                chatHistory.push({type: 'bot', message: response.message});
-                saveChatHistory();
-
-            } catch (error) {
-                console.error('Chat error:', error);
-
-                // Try demo mode as fallback
-                try {
-                    const demoResponse = getDemoResponse(message);
-                    addMessage(demoResponse.message + '\n\n*Note: Using demo mode. Configure API keys for full AI functionality.*');
-                    chatHistory.push({type: 'bot', message: demoResponse.message});
-                    saveChatHistory();
-                } catch (demoError) {
-                    console.error('Demo mode error:', demoError);
-                    addMessage('❌ Sorry, I encountered an error. Please try enabling demo mode or configuring API keys in settings.');
-                    showNotification('Message failed to send', 'error');
-                }
-            }
+            console.log('❌ OLD sendTextMessage called - redirecting to simple version');
+            sendUnifiedMessage();
         }
+
+
 
         async function sendCodeMessage() {
             const codeInput = document.getElementById('codeInput');
