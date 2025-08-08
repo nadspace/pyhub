@@ -3487,17 +3487,22 @@ for i in range(5)
         }
 
         async function sendTextMessage() {
+            console.log('sendTextMessage called');
             const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
+            console.log('messageInput element:', messageInput);
+            const message = messageInput ? messageInput.value.trim() : '';
+            console.log('message:', message);
 
             if (!message) {
+                console.log('No message, showing notification');
                 showNotification('Please enter a message', 'warning');
                 return;
             }
 
             // Add user message
+            console.log('Adding user message');
             addMessage(message, true);
-            messageInput.value = '';
+            if (messageInput) messageInput.value = '';
 
             // Add to history
             chatHistory.push({type: 'user', message: message});
@@ -3608,7 +3613,15 @@ for i in range(5)
 
         // Update addMessage for modern chat bubbles and avatars
         function addMessage(message, isUser = false) {
+            console.log('addMessage called with:', message, 'isUser:', isUser);
             const chatMessages = document.getElementById('chatMessages');
+            console.log('chatMessages in addMessage:', chatMessages);
+
+            if (!chatMessages) {
+                console.error('chatMessages element not found!');
+                return;
+            }
+
             const messageDiv = document.createElement('div');
             const messageId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
             messageDiv.className = 'flex mb-4 animate-fadeInUp ' + (isUser ? 'justify-end' : 'justify-start');
@@ -4772,9 +4785,16 @@ finally:
 
         // Show a welcoming note from PyBot when the chatbot loads
         function showPyBotWelcome() {
+            console.log('showPyBotWelcome called');
             const chatMessages = document.getElementById('chatMessages');
+            console.log('chatMessages element:', chatMessages);
+            console.log('chatMessages children count:', chatMessages ? chatMessages.children.length : 'null');
+
             if (chatMessages && chatMessages.children.length === 0) {
+                console.log('Adding welcome message');
                 addMessage("👋 Hi, I'm <b>PyBot</b>! Ask me anything about Python programming. I can help you with syntax, concepts, debugging, and more. Type your question below to get started!", false);
+            } else {
+                console.log('Welcome message not added - chatMessages exists:', !!chatMessages, 'children count:', chatMessages ? chatMessages.children.length : 'N/A');
             }
         }
 
