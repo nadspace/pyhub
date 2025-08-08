@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer components {
+  .gradient-bg {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 ease-in-out;
+    &:hover {
+      @apply transform -translate-y-1 shadow-lg;
+    }
+  }
+  
+  .code-block {
+    @apply border-l-4 border-blue-500 bg-gray-900 p-4 rounded-lg;
+  }
+  
+  .keyword-tag {
+    @apply bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm;
+  }
+}
+
+/* Custom properties */
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #8b5cf6;
+  --accent-color: #10b981;
+}
+
+/* Custom media queries */
+@custom-media --viewport-small (width <= 640px);
+@custom-media --viewport-medium (width <= 768px);
+@custom-media --viewport-large (width <= 1024px);
+
+/* Responsive styles */
+@media (--viewport-small) {
+  .container {
+    @apply px-4;
+  }
+}
+
+@media (--viewport-medium) {
+  .container {
+    @apply px-6;
+  }
+}
+
+@media (--viewport-large) {
+  .container {
+    @apply px-8;
+  }
+}
+
+/* Custom styles */
+.section-active { border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.1); }
+.framework-card { transition: all 0.3s ease; border-left: 4px solid transparent; }
+.framework-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); border-left-color: #f59e0b; }
+.message-bubble { animation: fadeInUp 0.3s ease-out; max-width: 80%; }
+.bot-message { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 18px 18px 18px 4px; }
+.user-message { background: linear-gradient(135deg, #10b981, #059669); border-radius: 18px 18px 4px 18px; }
+.typing-indicator { display: none; animation: pulse 1s infinite; }
+.question-card { transition: all 0.3s ease; border-left: 4px solid transparent; }
+.question-active { border-left-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+.option-btn { transition: all 0.2s ease; }
+.option-btn:hover { transform: translateX(5px); }
+.correct { background: linear-gradient(45deg, #10b981, #059669); }
+.incorrect { background: linear-gradient(45deg, #ef4444, #dc2626); }
+.progress-bar { transition: width 0.3s ease; }
+.page { display: none; }
+.page.active { display: block; }
+
+@keyframes fadeInUp { 
+  from { opacity: 0; transform: translateY(20px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+
+@keyframes pulse { 
+  0%, 100% { opacity: 1; } 
+  50% { opacity: 0.5; } 
+} 

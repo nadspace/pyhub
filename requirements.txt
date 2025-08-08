@@ -1,0 +1,24 @@
+# PyHub ChatterBot Requirements
+# Install with: pip install -r requirements.txt
+
+# Core dependencies
+flask==2.3.3
+flask-cors==4.0.0
+
+# ChatterBot and dependencies
+chatterbot==1.0.8
+chatterbot-corpus==1.2.0
+
+# Database
+SQLAlchemy==1.3.24
+
+# Natural Language Processing
+nltk==3.8.1
+pytz==2023.3
+
+# Math and utilities
+python-dateutil==2.8.2
+pyyaml==6.0.1
+
+# Optional: For better performance
+# spacy==3.6.1
