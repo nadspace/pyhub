@@ -1703,11 +1703,14 @@ show_args(**person)  # Kwargs: {'name': 'John', 'age': 30}</code></pre>
                         <form class="px-4 py-3" onsubmit="return handleNewChatSubmit(event);">
                             <div class="flex items-center gap-2">
                                 <input type="text" id="newChatInput" class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ask anything about Python..." autocomplete="off">
-                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors">
+                                <button type="submit" onclick="return handleNewChatSubmit(event);" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors">
                                     <i class="fas fa-paper-plane"></i>
                                 </button>
                                 <button type="button" onclick="forceTestChat()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-3 rounded-lg transition-colors" title="Test Chat">
                                     <i class="fas fa-rocket"></i>
+                                </button>
+                                <button type="button" onclick="alert('Button clicked!'); handleNewChatSubmit();" class="bg-red-600 hover:bg-red-700 text-white px-3 py-3 rounded-lg transition-colors" title="Debug Test">
+                                    <i class="fas fa-bug"></i>
                                 </button>
                             </div>
                         </form>
@@ -3330,70 +3333,11 @@ for i in range(5)
             }
         }
 
-        // FORCE OVERRIDE - Simple working chatbot function
+        // COMPLETELY DISABLED OLD FUNCTION
         function sendUnifiedMessage() {
-            console.log('🚀 FIXED VERSION - sendUnifiedMessage called');
+            console.log('🚫 OLD sendUnifiedMessage DISABLED - Use new chat system');
+            return; // Function completely disabled
 
-            // IMMEDIATE WORKING TEST
-            addSimpleMessage('Test: Function is working! 🎉', false);
-
-            try {
-                // Get the message input
-                const messageInput = document.getElementById('messageInput');
-                console.log('🔍 Looking for messageInput element...');
-                console.log('messageInput found:', !!messageInput);
-
-                if (!messageInput) {
-                    console.error('❌ messageInput not found');
-                    // Try alternative IDs
-                    const alternatives = ['simpleMessageInput', 'chatInput', 'textInput'];
-                    for (const altId of alternatives) {
-                        const altInput = document.getElementById(altId);
-                        if (altInput) {
-                            console.log('✅ Found alternative input:', altId);
-                            messageInput = altInput;
-                            break;
-                        }
-                    }
-
-                    if (!messageInput) {
-                        console.error('❌ No input element found at all');
-                        addSimpleMessage('Error: Message input not found. Please refresh the page.', false);
-                        return;
-                    }
-                }
-
-                const message = messageInput.value.trim();
-                console.log('📝 Message content:', message);
-
-                if (!message) {
-                    console.log('⚠️ No message to send');
-                    addSimpleMessage('Please type a message first! 😊', false);
-                    return;
-                }
-
-                console.log('📤 Processing message:', message);
-
-                // Add user message immediately
-                addSimpleMessage(message, true);
-                messageInput.value = '';
-
-                // Add bot response after short delay
-                setTimeout(() => {
-                    try {
-                        const response = getSimpleResponse(message);
-                        addSimpleMessage(response, false);
-                        console.log('✅ Response added successfully');
-                    } catch (error) {
-                        console.error('❌ Error generating response:', error);
-                        addSimpleMessage('I apologize, but I encountered an issue generating a response. Please try asking again!', false);
-                    }
-                }, 300);
-
-            } catch (error) {
-                console.error('❌ Critical error in sendUnifiedMessage:', error);
-                addSimpleMessage('Something went wrong. Please refresh the page and try again.', false);
-            }
         }
 
         // Alternative simple send function for testing
@@ -3732,20 +3676,19 @@ I can help with Python topics like lists, functions, loops, and dictionaries. �
 
         // COMPLETELY DISABLE OLD FUNCTION
         async function sendTextMessage() {
-            console.log('🚫 OLD sendTextMessage DISABLED - using simple version');
-            addSimpleMessage('Old function disabled - using new system! ✅', false);
-            return;
+            console.log('🚫 OLD sendTextMessage DISABLED');
+            return; // Completely disabled
         }
 
         // DISABLE OTHER PROBLEMATIC FUNCTIONS
         async function callSmartChatbot() {
             console.log('🚫 callSmartChatbot DISABLED');
-            return { message: 'API disabled - using simple responses' };
+            return { message: 'Function disabled' };
         }
 
         function getDemoResponse() {
             console.log('🚫 getDemoResponse DISABLED');
-            return { message: 'Demo disabled - using simple responses' };
+            return { message: 'Function disabled' };
         }
 
 
@@ -3922,9 +3865,10 @@ I can help with Python topics like lists, functions, loops, and dictionaries. �
             });
         }
 
-        // Legacy sendMessage function - now uses unified approach
+        // Legacy sendMessage function - DISABLED
         async function sendMessage() {
-            await sendUnifiedMessage();
+            console.log('🚫 OLD sendMessage DISABLED');
+            return; // Completely disabled
         }
 
 
