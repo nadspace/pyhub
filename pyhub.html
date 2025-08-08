@@ -1702,32 +1702,66 @@ show_args(**person)  # Kwargs: {'name': 'John', 'age': 30}</code></pre>
 
                     <!-- Settings Panel (Hidden by default) -->
                     <div id="chatSettings" class="hidden bg-gray-900 border-b border-gray-700 px-6 py-4">
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm font-medium text-gray-300">Local AI Chatbot</span>
-                                <div class="flex gap-2">
-                                    <button onclick="testChatbotConnection()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                                        <i class="fas fa-vial mr-1"></i>Test Connection
-                                    </button>
-                                    <button onclick="viewChatbotStats()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                                        <i class="fas fa-chart-bar mr-1"></i>View Stats
-                                    </button>
+                        <div class="space-y-4">
+                            <!-- API Configuration -->
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <h4 class="text-sm font-semibold text-white mb-3">🔑 AI Provider Settings</h4>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-xs text-gray-300 mb-1 block">Hugging Face Token (Free)</label>
+                                        <input type="password" id="hfToken" placeholder="hf_xxxxxxxxxxxxxxxxx"
+                                               class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm border border-gray-600 focus:border-blue-400 focus:outline-none">
+                                        <p class="text-xs text-gray-400 mt-1">Get free token at <a href="https://huggingface.co/settings/tokens" target="_blank" class="text-blue-400 hover:underline">huggingface.co/settings/tokens</a></p>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-300 mb-1 block">Groq API Key (Free tier)</label>
+                                        <input type="password" id="groqKey" placeholder="gsk_xxxxxxxxxxxxxxxxx"
+                                               class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm border border-gray-600 focus:border-blue-400 focus:outline-none">
+                                        <p class="text-xs text-gray-400 mt-1">Get free key at <a href="https://console.groq.com/keys" target="_blank" class="text-blue-400 hover:underline">console.groq.com/keys</a></p>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-300 mb-1 block">Cohere API Key (Free tier)</label>
+                                        <input type="password" id="cohereKey" placeholder="co-xxxxxxxxxxxxxxxxx"
+                                               class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm border border-gray-600 focus:border-blue-400 focus:outline-none">
+                                        <p class="text-xs text-gray-400 mt-1">Get free key at <a href="https://dashboard.cohere.ai/api-keys" target="_blank" class="text-blue-400 hover:underline">dashboard.cohere.ai/api-keys</a></p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="saveAPIKeys()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                                            <i class="fas fa-save mr-1"></i>Save Keys
+                                        </button>
+                                        <button onclick="testChatbotConnection()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                                            <i class="fas fa-vial mr-1"></i>Test Connection
+                                        </button>
+                                        <button onclick="enableDemoMode()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                                            <i class="fas fa-play mr-1"></i>Demo Mode
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Chatbot Controls -->
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium text-gray-300">Chatbot Status</span>
-                                <div class="text-sm text-green-400">
-                                    <i class="fas fa-robot text-green-400 mr-1"></i>Smart AI Ready
+                                <div class="text-sm" id="chatbotStatus">
+                                    <i class="fas fa-robot text-yellow-400 mr-1"></i><span class="text-yellow-400">Setup Required</span>
                                 </div>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium text-gray-300">Response Style</span>
-                                <select id="responseStyle" onchange="onResponseStyleChange()" class="bg-gray-700 text-white px-3 py-1 rounded text-sm">
+                                <select id="responseStyle" onchange="onResponseStyleChange()" class="bg-gray-700 text-white px-3 py-1 rounded text-sm border border-gray-600 focus:border-blue-400 focus:outline-none">
                                     <option value="balanced">🎯 Balanced</option>
                                     <option value="detailed">📚 Detailed</option>
                                     <option value="concise">⚡ Concise</option>
                                     <option value="beginner">🎓 Beginner-Friendly</option>
                                 </select>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="viewChatbotStats()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                                    <i class="fas fa-chart-bar mr-1"></i>View Stats
+                                </button>
+                                <button onclick="clearChatHistory()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                                    <i class="fas fa-trash mr-1"></i>Clear Chat
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -2001,7 +2035,20 @@ A complete Python learning platform with the following features:
                     showPyBotWelcome();
                 }
 
+                // Auto-enable demo mode if no API keys are configured
+                const hfToken = localStorage.getItem('hf_token');
+                const groqKey = localStorage.getItem('groq_key');
+                const cohereKey = localStorage.getItem('cohere_key');
+                const demoMode = localStorage.getItem('demo_mode');
 
+                if (!hfToken && !groqKey && !cohereKey && demoMode !== 'true') {
+                    // Auto-enable demo mode for better user experience
+                    localStorage.setItem('demo_mode', 'true');
+                    updateChatbotStatus();
+                    setTimeout(() => {
+                        addMessage('🎭 Demo mode automatically enabled! I can help you with Python questions using built-in knowledge. For full AI capabilities, configure API keys in settings.');
+                    }, 1000);
+                }
             }
 
             // Notes Section
@@ -2767,7 +2814,7 @@ while count < 5:
                 }
             };
 
-            // Local Smart Chatbot Integration with Response Style
+            // AI Chatbot Integration with Multiple Providers
             async function callSmartChatbot(message) {
                 try {
                     // Get selected response style
@@ -2775,49 +2822,464 @@ while count < 5:
 
                     // Add style instruction to message based on selection
                     let styledMessage = message;
+                    const pythonContext = "You are PyBot, a helpful Python programming assistant. Focus on Python-related questions and provide accurate, helpful responses.";
+
                     switch(responseStyle) {
                         case 'detailed':
-                            styledMessage = `Please provide a detailed, comprehensive explanation: ${message}`;
+                            styledMessage = `${pythonContext} Please provide a detailed, comprehensive explanation with examples: ${message}`;
                             break;
                         case 'concise':
-                            styledMessage = `Please provide a brief, concise answer: ${message}`;
+                            styledMessage = `${pythonContext} Please provide a brief, concise answer: ${message}`;
                             break;
                         case 'beginner':
-                            styledMessage = `Please explain in beginner-friendly terms with simple examples: ${message}`;
+                            styledMessage = `${pythonContext} Please explain in beginner-friendly terms with simple examples: ${message}`;
                             break;
                         case 'balanced':
                         default:
-                            // Use original message for balanced style
+                            styledMessage = `${pythonContext} ${message}`;
                             break;
                     }
 
-                    const response = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            message: styledMessage,
-                            style: responseStyle,
-                            original_message: message
-                        })
-                    });
+                    // Check if any API keys are configured
+                    const hfToken = localStorage.getItem('hf_token');
+                    const groqKey = localStorage.getItem('groq_key');
+                    const cohereKey = localStorage.getItem('cohere_key');
+                    const demoMode = localStorage.getItem('demo_mode');
 
-                    if (!response.ok) {
-                        throw new Error(`Smart Chatbot error: ${response.status}`);
+                    // If demo mode is enabled, use it directly
+                    if (demoMode === 'true') {
+                        return getDemoResponse(message);
                     }
 
-                    const data = await response.json();
+                    // If no API keys are configured, suggest demo mode
+                    if (!hfToken && !groqKey && !cohereKey) {
+                        throw new Error('No API keys configured. Please enable demo mode or add API keys in settings.');
+                    }
 
-                    // Add to conversation history for context
-                    conversationHistory.push({ role: 'user', content: message });
-                    conversationHistory.push({ role: 'assistant', content: data.message });
+                    // Try multiple AI providers in order of preference
+                    const providers = [];
+                    if (hfToken) providers.push({ name: 'huggingface', func: callHuggingFaceAPI });
+                    if (groqKey) providers.push({ name: 'groq', func: callGroqAPI });
+                    if (cohereKey) providers.push({ name: 'cohere', func: callCohereAPI });
 
-                    return data;
+                    for (const provider of providers) {
+                        try {
+                            const response = await provider.func(styledMessage);
+
+                            // Add to conversation history for context
+                            conversationHistory.push({ role: 'user', content: message });
+                            conversationHistory.push({ role: 'assistant', content: response.message });
+
+                            return response;
+                        } catch (error) {
+                            console.log(`${provider.name} failed, trying next provider...`);
+                            continue;
+                        }
+                    }
+
+                    throw new Error('All configured AI providers failed');
+
                 } catch (error) {
                     console.error('Smart Chatbot Error:', error);
-                    throw error;
+
+                    // Try demo mode as final fallback
+                    const demoMode = localStorage.getItem('demo_mode');
+                    if (demoMode === 'true') {
+                        return getDemoResponse(message);
+                    }
+
+                    // If no demo mode, suggest enabling it
+                    throw new Error('Chatbot failed. Please enable demo mode in settings or configure API keys.');
                 }
+            }
+
+            // API Key Management
+            function saveAPIKeys() {
+                const hfToken = document.getElementById('hfToken').value;
+                const groqKey = document.getElementById('groqKey').value;
+                const cohereKey = document.getElementById('cohereKey').value;
+
+                if (hfToken) localStorage.setItem('hf_token', hfToken);
+                if (groqKey) localStorage.setItem('groq_key', groqKey);
+                if (cohereKey) localStorage.setItem('cohere_key', cohereKey);
+
+                updateChatbotStatus();
+                showNotification('API keys saved successfully!', 'success');
+            }
+
+            function loadAPIKeys() {
+                const hfToken = localStorage.getItem('hf_token');
+                const groqKey = localStorage.getItem('groq_key');
+                const cohereKey = localStorage.getItem('cohere_key');
+
+                if (hfToken) document.getElementById('hfToken').value = hfToken;
+                if (groqKey) document.getElementById('groqKey').value = groqKey;
+                if (cohereKey) document.getElementById('cohereKey').value = cohereKey;
+
+                updateChatbotStatus();
+            }
+
+            function updateChatbotStatus() {
+                const hfToken = localStorage.getItem('hf_token');
+                const groqKey = localStorage.getItem('groq_key');
+                const cohereKey = localStorage.getItem('cohere_key');
+                const demoMode = localStorage.getItem('demo_mode');
+                const statusElement = document.getElementById('chatbotStatus');
+
+                if (demoMode === 'true') {
+                    statusElement.innerHTML = '<i class="fas fa-robot text-purple-400 mr-1"></i><span class="text-purple-400">Demo Mode</span>';
+                } else if (hfToken || groqKey || cohereKey) {
+                    statusElement.innerHTML = '<i class="fas fa-robot text-green-400 mr-1"></i><span class="text-green-400">AI Ready</span>';
+                } else {
+                    statusElement.innerHTML = '<i class="fas fa-robot text-yellow-400 mr-1"></i><span class="text-yellow-400">Setup Required</span>';
+                }
+            }
+
+            // Enable demo mode for testing without API keys
+            function enableDemoMode() {
+                localStorage.setItem('demo_mode', 'true');
+                updateChatbotStatus();
+                addMessage('🎭 Demo mode enabled! I can now respond to your Python questions using built-in knowledge. Try asking "What are Python lists?" or "How do functions work?"');
+                showNotification('Demo mode enabled! Chatbot ready to help.', 'success');
+            }
+
+            // Demo response function with comprehensive Python knowledge
+            function getDemoResponse(message) {
+                const lowerMessage = message.toLowerCase();
+
+                if (lowerMessage.includes('list') || lowerMessage.includes('array')) {
+                    return {
+                        message: `**Python Lists** 📝
+
+Lists are ordered collections that can store multiple items:
+
+\`\`\`python
+# Creating lists
+fruits = ['apple', 'banana', 'orange']
+numbers = [1, 2, 3, 4, 5]
+mixed = [1, 'hello', 3.14, True]
+
+# Accessing items
+print(fruits[0])     # apple (first item)
+print(fruits[-1])    # orange (last item)
+print(fruits[1:3])   # ['banana', 'orange'] (slice)
+
+# Adding items
+fruits.append('grape')        # Add to end
+fruits.insert(1, 'mango')     # Insert at position
+
+# Removing items
+fruits.remove('banana')       # Remove specific item
+last_fruit = fruits.pop()     # Remove and return last
+
+# List methods
+fruits.sort()                 # Sort alphabetically
+fruits.reverse()              # Reverse order
+print(len(fruits))            # Get length
+\`\`\`
+
+**Common operations:**
+- \`append()\` - Add item to end
+- \`insert()\` - Add item at position
+- \`remove()\` - Remove specific item
+- \`pop()\` - Remove and return item
+- \`sort()\` - Sort the list
+- \`len()\` - Get list length`,
+                        provider: 'demo'
+                    };
+                }
+
+                if (lowerMessage.includes('function') || lowerMessage.includes('def')) {
+                    return {
+                        message: `**Python Functions** 🔧
+
+Functions are reusable blocks of code that perform specific tasks:
+
+\`\`\`python
+# Basic function
+def greet(name):
+    return f"Hello, {name}!"
+
+# Function with multiple parameters
+def calculate_area(length, width):
+    return length * width
+
+# Function with default parameter
+def power(base, exponent=2):
+    return base ** exponent
+
+# Function with variable arguments
+def sum_all(*numbers):
+    return sum(numbers)
+
+# Using functions
+message = greet("Python")           # "Hello, Python!"
+area = calculate_area(5, 3)         # 15
+square = power(4)                   # 16 (uses default)
+cube = power(4, 3)                  # 64
+total = sum_all(1, 2, 3, 4, 5)     # 15
+\`\`\`
+
+**Key concepts:**
+- Use \`def\` keyword to define functions
+- Parameters go in parentheses
+- Use \`return\` to send back values
+- Functions help organize and reuse code
+- Can have default parameter values`,
+                        provider: 'demo'
+                    };
+                }
+
+                if (lowerMessage.includes('loop') || lowerMessage.includes('for') || lowerMessage.includes('while')) {
+                    return {
+                        message: `**Python Loops** 🔄
+
+Loops let you repeat code multiple times:
+
+\`\`\`python
+# For loop - iterate over a sequence
+fruits = ['apple', 'banana', 'orange']
+for fruit in fruits:
+    print(f"I like {fruit}")
+
+# For loop with range
+for i in range(5):
+    print(f"Number: {i}")  # 0, 1, 2, 3, 4
+
+# For loop with enumerate (get index and value)
+for index, fruit in enumerate(fruits):
+    print(f"{index}: {fruit}")
+
+# While loop - repeat while condition is true
+count = 0
+while count < 5:
+    print(f"Count: {count}")
+    count += 1
+
+# Loop control
+for i in range(10):
+    if i == 3:
+        continue  # Skip this iteration
+    if i == 7:
+        break     # Exit the loop
+    print(i)
+\`\`\`
+
+**Types of loops:**
+- \`for\` - Iterate over sequences
+- \`while\` - Repeat while condition is true
+- \`break\` - Exit loop early
+- \`continue\` - Skip current iteration`,
+                        provider: 'demo'
+                    };
+                }
+
+                if (lowerMessage.includes('dictionary') || lowerMessage.includes('dict')) {
+                    return {
+                        message: `**Python Dictionaries** 📚
+
+Dictionaries store key-value pairs:
+
+\`\`\`python
+# Creating dictionaries
+person = {
+    'name': 'John',
+    'age': 30,
+    'city': 'New York'
+}
+
+# Accessing values
+print(person['name'])        # John
+print(person.get('age'))     # 30 (safe access)
+
+# Adding/updating values
+person['job'] = 'Developer'  # Add new key-value
+person['age'] = 31           # Update existing
+
+# Dictionary methods
+keys = person.keys()         # Get all keys
+values = person.values()     # Get all values
+items = person.items()       # Get key-value pairs
+
+# Iterating through dictionary
+for key, value in person.items():
+    print(f"{key}: {value}")
+
+# Dictionary comprehension
+squares = {x: x**2 for x in range(5)}
+# {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+\`\`\`
+
+**Key features:**
+- Store data as key-value pairs
+- Keys must be unique
+- Fast lookup by key
+- Mutable (can be changed)`,
+                        provider: 'demo'
+                    };
+                }
+
+                if (lowerMessage.includes('variable') || lowerMessage.includes('data type')) {
+                    return {
+                        message: `**Python Variables & Data Types** 📊
+
+Variables store different types of data:
+
+\`\`\`python
+# Numbers
+age = 25                    # Integer
+price = 19.99              # Float
+complex_num = 3 + 4j       # Complex
+
+# Strings
+name = "Python"            # String
+message = 'Hello World'    # Also string
+multiline = """This is
+a multiline string"""
+
+# Boolean
+is_active = True
+is_complete = False
+
+# None (represents absence of value)
+result = None
+
+# Type checking
+print(type(age))           # <class 'int'>
+print(type(price))         # <class 'float'>
+print(type(name))          # <class 'str'>
+
+# Type conversion
+str_num = "123"
+int_num = int(str_num)     # Convert to integer
+float_num = float(str_num) # Convert to float
+\`\`\`
+
+**Data types:**
+- \`int\` - Whole numbers
+- \`float\` - Decimal numbers
+- \`str\` - Text
+- \`bool\` - True/False
+- \`None\` - No value`,
+                        provider: 'demo'
+                    };
+                }
+
+                // Generic helpful response
+                return {
+                    message: `I'm here to help with Python programming! 🐍 *(Demo Mode)*
+
+**Try asking about:**
+- "What are Python lists?" - Learn about storing multiple items
+- "How do functions work?" - Understand reusable code blocks
+- "Explain Python loops" - Learn about repeating code
+- "What are Python dictionaries?" - Key-value data storage
+- "Tell me about variables" - Data types and storage
+
+**Or ask specific questions like:**
+- "How to read a file in Python?"
+- "What's the difference between lists and tuples?"
+- "How to handle errors in Python?"
+
+*Note: This is demo mode with built-in responses. For full AI capabilities, configure API keys in settings.*
+
+What specific Python topic would you like to learn about?`,
+                    provider: 'demo'
+                };
+            }
+
+            // Hugging Face API (Free)
+            async function callHuggingFaceAPI(message) {
+                const token = localStorage.getItem('hf_token');
+                if (!token) throw new Error('Hugging Face token not configured');
+
+                const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        inputs: message,
+                        parameters: {
+                            max_length: 500,
+                            temperature: 0.7
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Hugging Face API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return {
+                    message: data.generated_text || data[0]?.generated_text || "I'm here to help with Python questions!",
+                    provider: 'huggingface'
+                };
+            }
+
+            // Groq API (Free tier available)
+            async function callGroqAPI(message) {
+                const apiKey = localStorage.getItem('groq_key');
+                if (!apiKey) throw new Error('Groq API key not configured');
+
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'llama3-8b-8192',
+                        messages: [
+                            { role: 'system', content: 'You are PyBot, a helpful Python programming assistant.' },
+                            { role: 'user', content: message }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Groq API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return {
+                    message: data.choices[0]?.message?.content || "I'm here to help with Python questions!",
+                    provider: 'groq'
+                };
+            }
+
+            // Cohere API (Free tier available)
+            async function callCohereAPI(message) {
+                const apiKey = localStorage.getItem('cohere_key');
+                if (!apiKey) throw new Error('Cohere API key not configured');
+
+                const response = await fetch('https://api.cohere.ai/v1/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'command-light',
+                        prompt: message,
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Cohere API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return {
+                    message: data.generations[0]?.text || "I'm here to help with Python questions!",
+                    provider: 'cohere'
+                };
             }
 
             // Fallback function for local responses
@@ -3048,8 +3510,18 @@ for i in range(5)
 
             } catch (error) {
                 console.error('Chat error:', error);
-                addMessage('❌ Sorry, I encountered an error. Please try again.');
-                showNotification('Message failed to send', 'error');
+
+                // Try demo mode as fallback
+                try {
+                    const demoResponse = getDemoResponse(message);
+                    addMessage(demoResponse.message + '\n\n*Note: Using demo mode. Configure API keys for full AI functionality.*');
+                    chatHistory.push({type: 'bot', message: demoResponse.message});
+                    saveChatHistory();
+                } catch (demoError) {
+                    console.error('Demo mode error:', demoError);
+                    addMessage('❌ Sorry, I encountered an error. Please try enabling demo mode or configuring API keys in settings.');
+                    showNotification('Message failed to send', 'error');
+                }
             }
         }
 
@@ -4266,12 +4738,13 @@ finally:
             // Initialize chatbot settings
             loadChatHistory();
             loadResponseStyle();
+            loadAPIKeys();
 
-            // Show welcome message about local Smart Chatbot
+            // Show welcome message about AI Chatbot
             setTimeout(() => {
-                if (!localStorage.getItem('smart_chatbot_welcome_shown')) {
-                    showNotification('🤖 Smart Local AI Chatbot Ready! No API keys needed.', 'success');
-                    localStorage.setItem('smart_chatbot_welcome_shown', 'true');
+                if (!localStorage.getItem('ai_chatbot_welcome_shown')) {
+                    showNotification('🤖 AI Chatbot Ready! Configure API keys in settings for full functionality.', 'info');
+                    localStorage.setItem('ai_chatbot_welcome_shown', 'true');
                 }
             }, 1000);
 
