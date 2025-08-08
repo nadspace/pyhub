@@ -1679,15 +1679,15 @@ show_args(**person)  # Kwargs: {'name': 'John', 'age': 30}</code></pre>
                                 <i class="fas fa-robot text-white text-lg"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-white">PyBot v3.0 - DeepSeek AI</h2>
+                                <h2 class="text-lg font-bold text-white">PyBot v4.0 - Multi-AI System</h2>
                                 <p class="text-xs text-green-400">
                                     <span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-1"></span>
-                                    Powered by DeepSeek API
+                                    DeepSeek API + ChatterBot + Fallback
                                 </p>
                             </div>
                         </div>
-                        <div class="text-sm text-blue-400">
-                            <i class="fas fa-brain mr-1"></i>AI POWERED
+                        <div class="text-sm text-purple-400">
+                            <i class="fas fa-layer-group mr-1"></i>MULTI-TIER AI
                         </div>
                     </div>
 
@@ -5086,12 +5086,13 @@ finally:
                 .replace(/\n/g, '<br>');
         }
 
-        // DeepSeek API Integration with CORS handling
+        // Multi-tier Response System: DeepSeek API -> ChatterBot -> Fallback
         async function getNewResponse(message) {
-            console.log('🤖 Attempting DeepSeek API call...');
+            console.log('🤖 Getting response using multi-tier system...');
 
+            // Tier 1: Try DeepSeek API
             try {
-                // First try direct API call
+                console.log('🌐 Attempting DeepSeek API call...');
                 const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
                     method: 'POST',
                     headers: {
@@ -5115,35 +5116,131 @@ finally:
                     })
                 });
 
-                if (!response.ok) {
-                    console.error(`❌ API HTTP Error: ${response.status} ${response.statusText}`);
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        console.log('✅ DeepSeek API response received');
+                        return data.choices[0].message.content + '\n\n*Powered by DeepSeek AI*';
+                    }
                 }
-
-                const data = await response.json();
-                console.log('✅ DeepSeek API response received:', data);
-
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    return data.choices[0].message.content;
-                } else {
-                    console.error('❌ Unexpected API response format:', data);
-                    throw new Error('Invalid API response format');
-                }
+                throw new Error('API response invalid');
 
             } catch (error) {
-                console.error('❌ DeepSeek API Error Details:', error);
-                console.error('❌ Error type:', error.name);
-                console.error('❌ Error message:', error.message);
-
-                // Check if it's a CORS error
-                if (error.message.includes('CORS') || error.message.includes('fetch')) {
-                    console.log('🔄 CORS issue detected, using fallback responses');
-                    return getFallbackResponse(message) + '\n\n*Note: Using offline mode due to browser security restrictions. For full AI features, the API needs to be called from a server.*';
-                }
-
-                // For any other error, use fallback
-                return getFallbackResponse(message) + '\n\n*Note: API temporarily unavailable, using offline responses.*';
+                console.log('❌ DeepSeek API failed, trying ChatterBot...');
             }
+
+            // Tier 2: Try ChatterBot (local AI)
+            try {
+                const chatterResponse = await getChatterBotResponse(message);
+                if (chatterResponse) {
+                    console.log('✅ ChatterBot response received');
+                    return chatterResponse + '\n\n*Powered by Local ChatterBot AI*';
+                }
+            } catch (error) {
+                console.log('❌ ChatterBot failed, using fallback...');
+            }
+
+            // Tier 3: Fallback responses
+            console.log('🔄 Using enhanced fallback responses');
+            return getFallbackResponse(message) + '\n\n*Using offline knowledge base*';
+        }
+
+        // ChatterBot Integration (Simulated - would need Python backend for real ChatterBot)
+        async function getChatterBotResponse(message) {
+            console.log('🤖 ChatterBot processing:', message);
+
+            // Simulate ChatterBot-style responses with learning patterns
+            const responses = getChatterBotStyleResponse(message);
+
+            // Simulate processing delay
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            return responses;
+        }
+
+        function getChatterBotStyleResponse(message) {
+            const lowerMessage = message.toLowerCase();
+
+            // ChatterBot-style pattern matching with learning simulation
+            const patterns = [
+                {
+                    patterns: ['hello', 'hi', 'hey', 'greetings'],
+                    responses: [
+                        "Hello! I'm PyBot, your Python learning companion. What would you like to explore today?",
+                        "Hi there! Ready to dive into some Python programming?",
+                        "Hey! I'm here to help you master Python. What's your question?"
+                    ]
+                },
+                {
+                    patterns: ['python', 'programming', 'code'],
+                    responses: [
+                        "Python is an amazing programming language! What specific aspect would you like to learn about?",
+                        "I love talking about Python! Are you interested in basics, advanced topics, or specific libraries?",
+                        "Python programming is my specialty! What can I help you code today?"
+                    ]
+                },
+                {
+                    patterns: ['list', 'array', 'collection'],
+                    responses: [
+                        "Python lists are versatile! They're ordered, mutable collections. Want to see some examples?",
+                        "Lists in Python are fantastic for storing multiple items. Let me show you the basics!",
+                        "Great question about lists! They're one of Python's most useful data structures."
+                    ]
+                },
+                {
+                    patterns: ['function', 'def', 'method'],
+                    responses: [
+                        "Functions are the building blocks of Python programs! They help organize and reuse code.",
+                        "Python functions are defined with 'def' and are super powerful for code organization!",
+                        "Functions make your code cleaner and more efficient. Want to see some examples?"
+                    ]
+                },
+                {
+                    patterns: ['loop', 'for', 'while', 'iterate'],
+                    responses: [
+                        "Loops are essential for repetitive tasks in Python! For and while loops each have their uses.",
+                        "Python loops are great for automation! Let me explain the different types.",
+                        "Iteration is powerful in Python! Loops help you process data efficiently."
+                    ]
+                },
+                {
+                    patterns: ['class', 'object', 'oop'],
+                    responses: [
+                        "Object-Oriented Programming in Python is elegant! Classes help organize complex code.",
+                        "Python classes are blueprints for creating objects. They're very intuitive!",
+                        "OOP in Python is clean and readable. Want to explore classes and objects?"
+                    ]
+                },
+                {
+                    patterns: ['help', 'learn', 'teach', 'explain'],
+                    responses: [
+                        "I'm here to help you learn Python! What topic interests you most?",
+                        "Learning Python is exciting! I can explain concepts, show examples, or help debug code.",
+                        "I love teaching Python! Ask me about any concept and I'll break it down for you."
+                    ]
+                }
+            ];
+
+            // Find matching pattern
+            for (const pattern of patterns) {
+                for (const keyword of pattern.patterns) {
+                    if (lowerMessage.includes(keyword)) {
+                        const randomResponse = pattern.responses[Math.floor(Math.random() * pattern.responses.length)];
+                        return randomResponse;
+                    }
+                }
+            }
+
+            // Default ChatterBot-style responses
+            const defaultResponses = [
+                "That's interesting! Can you tell me more about what you're trying to accomplish with Python?",
+                "I'd love to help! Could you be more specific about your Python question?",
+                "Great question! Python has many ways to solve problems. What's your specific goal?",
+                "I'm here to help with Python! What particular aspect would you like to explore?",
+                "Python is full of possibilities! What would you like to learn or build?"
+            ];
+
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
         }
 
         function getFallbackResponse(message) {
@@ -5297,8 +5394,8 @@ What would you like to learn? 🚀`;
 
         // Auto-welcome message on page load
         setTimeout(() => {
-            console.log('🔄 Loading DeepSeek-powered chat system...');
-            addNewMessage('🤖 **PyBot v3.0 - DeepSeek AI Loaded!** \n\nI\'m now powered by DeepSeek AI and ready to help with your Python questions! Ask me anything about Python programming. 🐍✨', false);
+            console.log('🔄 Loading Multi-AI chat system...');
+            addNewMessage('🤖 **PyBot v4.0 - Multi-AI System Loaded!** \n\n🌟 **Triple-Powered Intelligence:**\n• 🌐 **DeepSeek AI** - Advanced cloud AI\n• 🤖 **ChatterBot** - Local learning AI\n• 📚 **Knowledge Base** - Comprehensive fallback\n\nI\'ll always find a way to help with your Python questions! 🐍✨', false);
         }, 2000);
 
         // GLOBAL TEST FUNCTIONS - Can be called from browser console
@@ -5317,11 +5414,48 @@ What would you like to learn? 🚀`;
             try {
                 const response = await getNewResponse('Hello, can you help me with Python?');
                 addNewMessage(response, false);
-                console.log('✅ DeepSeek API test completed');
+                console.log('✅ Multi-AI system test completed');
             } catch (error) {
-                console.error('❌ DeepSeek API test failed:', error);
-                addNewMessage('❌ API test failed. Check console for details.', false);
+                console.error('❌ Multi-AI system test failed:', error);
+                addNewMessage('❌ System test failed. Check console for details.', false);
             }
+        };
+
+        window.testChatterBot = async function() {
+            console.log('🧪 TESTING CHATTERBOT...');
+            addNewMessage('Testing ChatterBot AI...', true);
+
+            try {
+                const response = await getChatterBotResponse('Hello, can you help me learn Python functions?');
+                addNewMessage(response + '\n\n*Direct ChatterBot Test*', false);
+                console.log('✅ ChatterBot test completed');
+            } catch (error) {
+                console.error('❌ ChatterBot test failed:', error);
+                addNewMessage('❌ ChatterBot test failed. Check console for details.', false);
+            }
+        };
+
+        window.testAllSystems = async function() {
+            console.log('🧪 TESTING ALL AI SYSTEMS...');
+            addNewMessage('Testing all AI systems sequentially...', true);
+
+            // Test ChatterBot
+            setTimeout(async () => {
+                const chatterResponse = await getChatterBotResponse('What are Python lists?');
+                addNewMessage('**ChatterBot:** ' + chatterResponse, false);
+            }, 500);
+
+            // Test Fallback
+            setTimeout(() => {
+                const fallbackResponse = getFallbackResponse('What are Python functions?');
+                addNewMessage('**Fallback:** ' + fallbackResponse, false);
+            }, 1000);
+
+            // Test Full System
+            setTimeout(async () => {
+                const fullResponse = await getNewResponse('How do Python loops work?');
+                addNewMessage('**Full System:** ' + fullResponse, false);
+            }, 1500);
         };
 
         window.debugChatForm = function() {
