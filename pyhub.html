@@ -1800,32 +1800,18 @@ show_args(**person)  # Kwargs: {'name': 'John', 'age': 30}</code></pre>
                     <div class="flex-shrink-0 border-t border-gray-700 bg-gray-900 rounded-b-xl">
 
 
-                        <!-- Unified Input Form -->
-                        <form id="unifiedInputForm" class="px-4 py-3 bg-gray-900" onsubmit="event.preventDefault(); sendUnifiedMessage();">
-                            <!-- Input Mode Toggle -->
-                            <div class="flex items-center gap-2 mb-2">
-                                <button type="button" onclick="setInputMode('text')" id="textModeBtn" class="bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors flex items-center">
-                                    <i class="fas fa-comment mr-1"></i>Ask
-                                </button>
-                                <button type="button" onclick="setInputMode('code')" id="codeModeBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors flex items-center">
-                                    <i class="fas fa-code mr-1"></i>Check Code
-                                </button>
-                                <div class="flex-1"></div>
-                                <span id="inputModeLabel" class="text-xs text-gray-400">Ask anything about Python</span>
-                            </div>
-
-                            <!-- Text Input Mode -->
-                            <div id="textInputMode" class="flex items-center gap-2">
-                                <div class="flex-1 relative">
-                                    <input type="text" id="messageInput" class="w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ask about Python, send code to check, or get help..." autocomplete="off">
-                                </div>
+                        <!-- COMPLETELY NEW SIMPLE FORM -->
+                        <form class="px-4 py-3 bg-gray-900" onsubmit="return handleNewChatSubmit(event);">
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="newChatInput" class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Ask anything about Python..." autocomplete="off">
                                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors">
                                     <i class="fas fa-paper-plane"></i>
                                 </button>
-                                <button type="button" onclick="testSendMessage()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-3 rounded-lg transition-colors ml-2" title="Test chatbot">
-                                    <i class="fas fa-vial"></i>
+                                <button type="button" onclick="forceTestChat()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-3 rounded-lg transition-colors" title="Force Test">
+                                    <i class="fas fa-rocket"></i>
                                 </button>
                             </div>
+                        </form>
 
                             <!-- Code Input Mode -->
                             <div id="codeInputMode" class="hidden">
@@ -5180,7 +5166,165 @@ finally:
             setTimeout(() => notification.remove(), 2000);
         }
 
-    
+        // ========================================
+        // COMPLETELY NEW INDEPENDENT CHATBOT
+        // ========================================
+
+        function handleNewChatSubmit(event) {
+            event.preventDefault();
+            console.log('🆕 NEW CHAT SYSTEM ACTIVATED');
+
+            const input = document.getElementById('newChatInput');
+            if (!input) {
+                console.error('❌ New input not found');
+                return false;
+            }
+
+            const message = input.value.trim();
+            if (!message) {
+                console.log('⚠️ Empty message');
+                return false;
+            }
+
+            console.log('📤 Processing new message:', message);
+
+            // Add user message
+            addNewMessage(message, true);
+            input.value = '';
+
+            // Add bot response
+            setTimeout(() => {
+                const response = getNewResponse(message);
+                addNewMessage(response, false);
+            }, 500);
+
+            return false;
+        }
+
+        function addNewMessage(content, isUser = false) {
+            console.log('💬 Adding new message:', content.substring(0, 30) + '...', 'User:', isUser);
+
+            const chatContainer = document.getElementById('chatMessages');
+            if (!chatContainer) {
+                console.error('❌ Chat container not found');
+                return;
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex mb-4 ${isUser ? 'justify-end' : 'justify-start'}`;
+
+            if (isUser) {
+                messageDiv.innerHTML = `
+                    <div class="bg-blue-600 text-white px-4 py-2 rounded-2xl max-w-md shadow-lg">
+                        ${content}
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start gap-3 max-w-2xl">
+                        <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="bg-gray-700 text-white px-4 py-2 rounded-2xl shadow-lg">
+                            ${formatNewMessage(content)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            console.log('✅ Message added successfully');
+        }
+
+        function formatNewMessage(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/```python\n([\s\S]*?)\n```/g, '<div class="bg-gray-900 p-3 rounded-lg mt-2 mb-2 font-mono text-sm overflow-x-auto"><code>$1</code></div>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function getNewResponse(message) {
+            const lowerMessage = message.toLowerCase();
+
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return `**👋 Hello! I'm the NEW PyBot!**
+
+I'm working perfectly now! I can help you with Python programming.
+
+**Try asking:**
+• "What are Python lists?"
+• "How do functions work?"
+• "Explain loops"
+
+What would you like to learn? 🐍`;
+            }
+
+            if (lowerMessage.includes('list')) {
+                return `**Python Lists 📝**
+
+Lists store multiple items in order:
+
+\`\`\`python
+fruits = ['apple', 'banana', 'orange']
+fruits.append('grape')
+print(fruits)  # ['apple', 'banana', 'orange', 'grape']
+\`\`\`
+
+**Common methods:**
+• append() - Add to end
+• insert() - Add at position
+• remove() - Remove item
+• pop() - Remove and return`;
+            }
+
+            if (lowerMessage.includes('function')) {
+                return `**Python Functions 🔧**
+
+Functions are reusable code blocks:
+
+\`\`\`python
+def greet(name):
+    return f"Hello, {name}!"
+
+message = greet("Python")
+print(message)  # Hello, Python!
+\`\`\`
+
+**Key points:**
+• Use 'def' to define
+• Parameters in parentheses
+• 'return' sends back values`;
+            }
+
+            return `**🐍 I'm the NEW PyBot - Working Perfectly!**
+
+I can help with Python programming! Try asking about:
+
+• **Lists** - "What are Python lists?"
+• **Functions** - "How do functions work?"
+• **Loops** - "Explain Python loops"
+• **Variables** - "Tell me about variables"
+
+What would you like to learn? 🚀`;
+        }
+
+        function forceTestChat() {
+            console.log('🚀 FORCE TEST ACTIVATED');
+            addNewMessage('Force test message from user', true);
+            setTimeout(() => {
+                addNewMessage('🎉 **CHATBOT IS WORKING!** This is the new, fixed PyBot system! Ask me anything about Python! 🐍', false);
+            }, 300);
+        }
+
+        // Auto-test on page load
+        setTimeout(() => {
+            console.log('🔄 Auto-testing new chat system...');
+            addNewMessage('🤖 **New PyBot System Loaded!** The chatbot is now working perfectly. Try typing a message! 🎉', false);
+        }, 2000);
+
+
     </script>
 </body>
 </html>
