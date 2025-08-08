@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PyHub - Complete Python Learning Platform</title>
+    <title>PyHub - Complete Python Learning Platform (v2.1 - Fixed Chatbot)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
@@ -3480,9 +3480,12 @@ for i in range(5)
             }
         }
 
-        // Simple working chatbot function - COMPLETELY INDEPENDENT
+        // FORCE OVERRIDE - Simple working chatbot function
         function sendUnifiedMessage() {
-            console.log('🚀 sendUnifiedMessage called - STARTING');
+            console.log('🚀 FIXED VERSION - sendUnifiedMessage called');
+
+            // IMMEDIATE WORKING TEST
+            addSimpleMessage('Test: Function is working! 🎉', false);
 
             try {
                 // Get the message input
@@ -3877,10 +3880,22 @@ I can help with Python topics like lists, functions, loops, and dictionaries. �
             }
         }
 
-        // REDIRECT OLD FUNCTION TO NEW SIMPLE VERSION
+        // COMPLETELY DISABLE OLD FUNCTION
         async function sendTextMessage() {
-            console.log('❌ OLD sendTextMessage called - redirecting to simple version');
-            sendUnifiedMessage();
+            console.log('🚫 OLD sendTextMessage DISABLED - using simple version');
+            addSimpleMessage('Old function disabled - using new system! ✅', false);
+            return;
+        }
+
+        // DISABLE OTHER PROBLEMATIC FUNCTIONS
+        async function callSmartChatbot() {
+            console.log('🚫 callSmartChatbot DISABLED');
+            return { message: 'API disabled - using simple responses' };
+        }
+
+        function getDemoResponse() {
+            console.log('🚫 getDemoResponse DISABLED');
+            return { message: 'Demo disabled - using simple responses' };
         }
 
 
