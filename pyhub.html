@@ -3477,13 +3477,131 @@ for i in range(5)
             }
         }
 
-        // Unified message sending function
-        async function sendUnifiedMessage() {
-            if (currentInputMode === 'text') {
-                await sendTextMessage();
-            } else {
-                await sendCodeMessage();
+        // Simple working chatbot function
+        function sendUnifiedMessage() {
+            console.log('sendUnifiedMessage called');
+
+            // Get the message input
+            const messageInput = document.getElementById('messageInput');
+            if (!messageInput) {
+                console.error('messageInput not found');
+                return;
             }
+
+            const message = messageInput.value.trim();
+            if (!message) {
+                console.log('No message to send');
+                return;
+            }
+
+            console.log('Sending message:', message);
+
+            // Add user message
+            addSimpleMessage(message, true);
+            messageInput.value = '';
+
+            // Get and add bot response
+            setTimeout(() => {
+                const response = getSimpleResponse(message);
+                addSimpleMessage(response, false);
+            }, 500);
+        }
+
+        // Simple message adding function
+        function addSimpleMessage(content, isUser = false) {
+            console.log('addSimpleMessage called:', content, isUser);
+
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) {
+                console.error('chatMessages not found');
+                return;
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex mb-4 ${isUser ? 'justify-end' : 'justify-start'}`;
+
+            if (isUser) {
+                messageDiv.innerHTML = `
+                    <div class="bg-blue-600 text-white px-4 py-2 rounded-2xl rounded-tr-none max-w-md">
+                        ${content}
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start gap-3 max-w-md">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="bg-gray-700 text-white px-4 py-2 rounded-2xl rounded-tl-none">
+                            ${formatSimpleMessage(content)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Format messages
+        function formatSimpleMessage(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/```python\n([\s\S]*?)\n```/g, '<div class="bg-gray-900 p-3 rounded-lg mt-2 mb-2 font-mono text-sm overflow-x-auto"><code>$1</code></div>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // Get simple response
+        function getSimpleResponse(message) {
+            const lowerMessage = message.toLowerCase();
+
+            if (lowerMessage.includes('list')) {
+                return `**Python Lists 📝**
+
+Lists are ordered collections that can store multiple items:
+
+\`\`\`python
+fruits = ['apple', 'banana', 'orange']
+fruits.append('grape')
+print(fruits)  # ['apple', 'banana', 'orange', 'grape']
+\`\`\`
+
+**Common operations:**
+• \`append()\` - Add item to end
+• \`insert()\` - Add at specific position
+• \`remove()\` - Remove specific item
+• \`pop()\` - Remove and return item`;
+            }
+
+            if (lowerMessage.includes('function')) {
+                return `**Python Functions 🔧**
+
+Functions are reusable blocks of code:
+
+\`\`\`python
+def greet(name):
+    return f"Hello, {name}!"
+
+message = greet("Python")
+print(message)  # Hello, Python!
+\`\`\`
+
+**Key concepts:**
+• Use \`def\` keyword to define
+• Parameters go in parentheses
+• Use \`return\` to send back values`;
+            }
+
+            return `I'm here to help with Python programming! 🐍
+
+**Try asking about:**
+• "What are Python lists?"
+• "How do functions work?"
+• "Explain Python loops"
+• "What are dictionaries?"
+
+What would you like to learn about?`;
         }
 
         async function sendTextMessage() {
